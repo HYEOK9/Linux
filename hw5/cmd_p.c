@@ -1,0 +1,40 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define	MAX_CMD		256
+
+void
+DoCmd(char *cmd)
+{
+	printf("Doing %s", cmd);
+	sleep(1);
+	printf("Done\n");
+}
+
+int main()
+{
+	char	cmd[MAX_CMD];
+	int		pid;
+
+	while (1)  {
+		printf("CMD> ");
+		fgets(cmd, MAX_CMD, stdin);	
+		if (cmd[0] == 'q')
+			break;
+
+		if ((pid=fork())<0)  {
+			perror("fork");
+			exit(1);
+		}
+		//child process에서 DoCmd 실행
+		else if (pid == 0)  {
+			DoCmd(cmd);
+			exit(0);
+		}
+#if 0		//1로하면 cmd_i와 똑같이 동작, 0으로하면 parent는 또 입력받음
+		else  {
+			wait(NULL);
+		}
+#endif
+	}
+}
