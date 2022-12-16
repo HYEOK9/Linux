@@ -62,13 +62,13 @@ Producer(void *dummy)
 	printf("Producer: Start.....\n");
 
 	for (i = 0 ; i < NLOOPS ; i++)  {
-		if (/* pthread_mutex_lock */)  {
+		if (pthread_mutex_lock(&Mutex) < 0)  {
 			perror("pthread_mutex_lock");
 			pthread_exit(NULL);
 		}
 
 		while (Buf.counter == MAX_BUF)  {
-			if (/* pthread_cond_wait */)  {
+			if (pthread_cond_wait(&NotFull, &Mutex) < 0)  {
 				perror("pthread_cond_wait");
 				pthread_exit(NULL);
 			}
@@ -80,11 +80,11 @@ Producer(void *dummy)
 		Buf.in = (Buf.in + 1) % MAX_BUF;
 		Buf.counter++;
 
-		if (/* pthread_cond_signal */)  {
+		if (pthread_cond_signal(&NotEmpty) < 0)  {
 			perror("pthread_cond_signal");
 			pthread_exit(NULL);
 		}
-		if (/* pthread_mutex_unlock */)  {
+		if (pthread_mutex_unlock(&Mutex) < 0)  {
 			perror("pthread_mutex_unlock");
 			pthread_exit(NULL);
 		}
@@ -106,13 +106,13 @@ Consumer(void *dummy)
 	printf("Consumer: Start.....\n");
 
 	for (i = 0 ; i < NLOOPS ; i++)  {
-		if (/* pthread_mutex_lock */)  {
+		if (pthread_mutex_lock(&Mutex) < 0)  {
 			perror("pthread_mutex_lock");
 			pthread_exit(NULL);
 		}
 
 		while (Buf.counter == 0)  {
-			if (/* pthread_cond_wait */)  {
+			if (pthread_cond_wait(&NotEmpty, &Mutex) < 0)  {
 				perror("pthread_cond_wait");
 				pthread_exit(NULL);
 			}
@@ -123,11 +123,11 @@ Consumer(void *dummy)
 		Buf.out = (Buf.out + 1) % MAX_BUF;
 		Buf.counter--;
 
-		if (/* pthread_cond_signal */)  {
+		if (pthread_cond_signal(&NotFull) < 0)  {
 			perror("pthread_cond_signal");
 			pthread_exit(NULL);
 		}
-		if (/* pthread_mutex_unlock */)  {
+		if (pthread_mutex_unlock(&Mutex) < 0)  {
 			perror("pthread_mutex_unlock");
 			pthread_exit(NULL);
 		}
@@ -147,15 +147,15 @@ main()
 
 	srand(0x8888);
 
-	if (/* pthread_cond_init */)  {
+	if (pthread_cond_init(&NotFull, NULL) < 0)  {
 		perror("pthread_cond_init");
 		pthread_exit(NULL);
 	}
-	if (/* pthread_cond_init */)  {
+	if (pthread_cond_init(&NotEmpty, NULL) < 0)  {
 		perror("pthread_cond_init");
 		pthread_exit(NULL);
 	}
-	if (/* pthread_mutex_init */)  {
+	if (pthread_mutex_init(&Mutex, NULL) < 0)  {
 		perror("pthread_mutex_init");
 		pthread_exit(NULL);
 	}
@@ -181,13 +181,13 @@ main()
 
 	printf("Main    : %d items in buffer.....\n", Buf.counter);
 
-	if (/* pthread_cond_destroy */)  {
+	if (pthread_cond_destroy(&NotFull) < 0)  {
 		perror("pthread_cond_destroy");
 	}
-	if (/* pthread_cond_destroy */)  {
+	if (pthread_cond_destroy(&NotEmpty) < 0)  {
 		perror("pthread_cond_destroy");
 	}
-	if (/* pthread_mutex_destroy */)  {
+	if (pthread_mutex_destroy(&Mutex) < 0)  {
 		perror("pthread_mutex_destroy");
 	}
 }

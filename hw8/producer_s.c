@@ -13,6 +13,7 @@ main()
 	int					shmid, i, data;
 	int					emptySemid, fullSemid, mutexSemid;
 
+	//shared memory 만드는 과정
 	if ((shmid = shmget(SHM_KEY, SHM_SIZE, SHM_MODE)) < 0)  {
 		perror("shmget");
 		exit(1);
@@ -22,26 +23,29 @@ main()
 		exit(1);
 	}
 
-	if ((emptySemid = /* semInit */ ) < 0)  {
+	//mutex, full, empty semaphore 초기화
+	if ((emptySemid = semInit(EMPTY_SEM_KEY) ) < 0)  {
 		fprintf(stderr, "semInit failure\n");
 		exit(1);
 	}
-	if ((fullSemid = /* semInit */) < 0)  {
+	if ((fullSemid = semInit(FULL_SEM_KEY)) < 0)  {
 		fprintf(stderr, "semInit failure\n");
 		exit(1);
 	}
-	if ((mutexSemid = /* semInit */) < 0)  {
+	if ((mutexSemid = semInit(MUTEX_SEM_KEY)) < 0)  {
 		fprintf(stderr, "semInit failure\n");
 		exit(1);
 	}
 
 	srand(0x8888);
 	for (i = 0 ; i < NLOOPS ; i++)  {
-		if (/* semWait */ < 0)  {
+		//producer는 queue에 데이터를 넣기 전 empty semaphore을 1 감소 시킴
+		if (semWait(emptySemid) < 0)  {
 			fprintf(stderr, "semWait failure\n");
 			exit(1);
 		}
-		if (/* semWait */ < 0)  {
+		//데이터를 넣기 전 mutexSemid도 1감소시킴
+		if (semWait(mutexSemid) < 0)  {
 			fprintf(stderr, "semWait failure\n");
 			exit(1);
 		}
@@ -52,11 +56,13 @@ main()
 		pBuf->in = (pBuf->in + 1) % MAX_BUF;
 		pBuf->counter++;
 
-		if (/* semPost */ < 0)  {
+		//데이터를 넣은 후 mutex semaphore을 1증가시키고 나옴
+		if (semPost(mutexSemid) < 0)  {
 			fprintf(stderr, "semPost failure\n");
 			exit(1);
 		}
-		if (/* semPost */ < 0)  {
+		//full semaphore도 1 증가 시킴
+		if (semPost(fullSemid) < 0)  {
 			fprintf(stderr, "semPost failure\n");
 			exit(1);
 		}
@@ -68,13 +74,14 @@ main()
 	sleep(2);
 	printf("Producer: %d items in buffer.....\n", pBuf->counter);
 	
-	if (/* semDestroy */ < 0)  {
+	//종료 전 semaphore destory
+	if (semDestroy(mutexSemid) < 0)  {
 		fprintf(stderr, "semDestroy failure\n");
 	}
-	if (/* semDestroy */ < 0)  {
+	if (semDestroy(emptySemid) < 0)  {
 		fprintf(stderr, "semDestroy failure\n");
 	}
-	if (/* semDestroy */ < 0)  {
+	if (semDestroy(fullSemid) < 0)  {
 		fprintf(stderr, "semDestroy failure\n");
 	}
 	if (shmctl(shmid, IPC_RMID, 0) < 0)  {

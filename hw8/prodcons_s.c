@@ -61,11 +61,11 @@ Producer(void *dummy)
 	printf("Producer: Start.....\n");
 
 	for (i = 0 ; i < NLOOPS ; i++)  {
-		if (/* sem_wait */)  {
+		if (sem_wait(&EmptySem) < 0)  {
 			perror("sem_wait");
 			pthread_exit(NULL);
 		}
-		if (/* sem_wait */)  {
+		if (sem_wait(&MutexSem) < 0)  {
 			perror("sem_wait");
 			pthread_exit(NULL);
 		}
@@ -76,11 +76,11 @@ Producer(void *dummy)
 		Buf.in = (Buf.in + 1) % MAX_BUF;
 		Buf.counter++;
 
-		if (/* sem_post */)  {
+		if (sem_post(&MutexSem) < 0)  {
 			perror("sem_post");
 			pthread_exit(NULL);
 		}
-		if (/* sem_post */)  {
+		if (sem_post(&FullSem) < 0)  {
 			perror("sem_post");
 			pthread_exit(NULL);
 		}
@@ -102,11 +102,11 @@ Consumer(void *dummy)
 	printf("Consumer: Start.....\n");
 
 	for (i = 0 ; i < NLOOPS ; i++)  {
-		if (/* sem_wait */)  {
+		if (sem_wait(&FullSem) < 0)  {
 			perror("sem_wait");
 			pthread_exit(NULL);
 		}
-		if (/* sem_wait */)  {
+		if (sem_wait(&MutexSem) < 0)  {
 			perror("sem_wait");
 			pthread_exit(NULL);
 		}
@@ -116,11 +116,11 @@ Consumer(void *dummy)
 		Buf.out = (Buf.out + 1) % MAX_BUF;
 		Buf.counter--;
 
-		if (/* sem_post */)  {
+		if (sem_post(&MutexSem) < 0)  {
 			perror("sem_post");
 			pthread_exit(NULL);
 		}
-		if (/* sem_post */)  {
+		if (sem_post(&EmptySem) < 0)  {
 			perror("sem_post");
 			pthread_exit(NULL);
 		}
@@ -140,15 +140,15 @@ main()
 
 	srand(0x8888);
 
-	if (/* sem_init */)  {
+	if (sem_init(&EmptySem, 0, MAX_BUF) < 0)  {
 		perror("sem_init");
 		exit(1);
 	}
-	if (/* sem_init */)  {
+	if (sem_init(&FullSem, 0, 0) < 0)  {
 		perror("sem_init");
 		exit(1);
 	}
-	if (/* sem_init */)  {
+	if (sem_init(&MutexSem, 0, 1) < 0)  {
 		perror("sem_init");
 		exit(1);
 	}
@@ -174,13 +174,13 @@ main()
 	
 	printf("Main    : %d items in buffer.....\n", Buf.counter);
 
-	if (/* sem_destroy */)  {
+	if (sem_destroy(&EmptySem) < 0)  {
 		perror("sem_destroy");
 	}
-	if (/* sem_destroy */)  {
+	if (sem_destroy(&FullSem) < 0)  {
 		perror("sem_destroy");
 	}
-	if (/* sem_destroy */)  {
+	if (sem_destroy(&MutexSem) < 0)  {
 		perror("sem_destroy");
 	}
 }

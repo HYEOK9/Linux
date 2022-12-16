@@ -61,11 +61,12 @@ Producer(void *dummy)
 	printf("Producer: Start.....\n");
 
 	for (i = 0 ; i < NLOOPS ; i++)  {
-		if (/* sem_wait */)  {
+		//data 넣기 전 empty, mutex semaphore 1 감소시킴
+		if (sem_wait(&EmptySem)<0)  {
 			perror("sem_wait");
 			pthread_exit(NULL);
 		}
-		if (/* sem_wait */)  {
+		if (sem_wait(&MutexSem)<0)  {
 			perror("sem_wait");
 			pthread_exit(NULL);
 		}
@@ -76,11 +77,12 @@ Producer(void *dummy)
 		Buf.in = (Buf.in + 1) % MAX_BUF;
 		Buf.counter++;
 
-		if (/* sem_post */)  {
+		//data 넣은 후 full, mutex semaphore 1 증가시킴
+		if (sem_post(&MutexSem)<0)  {
 			perror("sem_post");
 			pthread_exit(NULL);
 		}
-		if (/* sem_post */)  {
+		if (sem_post(&FullSem)<0)  {
 			perror("sem_post");
 			pthread_exit(NULL);
 		}
@@ -102,11 +104,12 @@ Consumer(void *dummy)
 	printf("Consumer: Start.....\n");
 
 	for (i = 0 ; i < NLOOPS ; i++)  {
-		if (/* sem_wait */)  {
+		//data 빼기 전 full semaphore, mutext semaphore 1 감소시킴
+		if (sem_wait(&FullSem)<0)  {
 			perror("sem_wait");
 			pthread_exit(NULL);
 		}
-		if (/* sem_wait */)  {
+		if (sem_wait(&MutexSem)<0)  {
 			perror("sem_wait");
 			pthread_exit(NULL);
 		}
@@ -116,11 +119,12 @@ Consumer(void *dummy)
 		Buf.out = (Buf.out + 1) % MAX_BUF;
 		Buf.counter--;
 
-		if (/* sem_post */)  {
+		//data 뺀 후 Mutex semaphore, Empty Semaphore 증가시킴
+		if (sem_post(&MutexSem)<0)  {
 			perror("sem_post");
 			pthread_exit(NULL);
 		}
-		if (/* sem_post */)  {
+		if (sem_post(&EmptySem)<0)  {
 			perror("sem_post");
 			pthread_exit(NULL);
 		}
@@ -140,15 +144,16 @@ main()
 
 	srand(0x9999);
 
-	if (/* sem_init */)  {
+	//main 함수에서 producer,consumer 실행전 semaphore 초기화
+	if (sem_init(&EmptySem,0,MAX_BUF)<0)  {
 		perror("sem_init");
 		exit(1);
 	}
-	if (/* sem_init */)  {
+	if (sem_init(&MutexSem,0,MAX_BUF)<0)  {
 		perror("sem_init");
 		exit(1);
 	}
-	if (/* sem_init */)  {
+	if (sem_init(&FullSem,0,MAX_BUF)<0)  {
 		perror("sem_init");
 		exit(1);
 	}
@@ -174,13 +179,14 @@ main()
 
 	printf("Main    : %d items in buffer.....\n", Buf.counter);
 
-	if (/* sem_destroy */)  {
+	//종료전 semaphore destroy
+	if (sem_destroy(&EmptySem)<0)  {
 		perror("sem_destroy");
 	}
-	if (/* sem_destroy */)  {
+	if (sem_destroy(&FullSem)<0)  {
 		perror("sem_destroy");
 	}
-	if (/* sem_destroy */)  {
+	if (sem_destroy(&MutexSem)<0)  {
 		perror("sem_destroy");
 	}
 }

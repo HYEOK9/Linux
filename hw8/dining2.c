@@ -83,7 +83,7 @@ Test(int id)
 			&& State[RIGHT(id)] != EATING)  {
 		State[id] = EATING;
 
-		if (/* sem_post */)  {
+		if (sem_post(&Philosopher[id]) < 0)  {
 			perror("sem_post");
 			pthread_exit(NULL);
 		}
@@ -93,7 +93,7 @@ Test(int id)
 void
 PickUp(int id)
 {
-	if (/* sem_wait */)  {
+	if (sem_wait(&Mutex) < 0)  {
 		perror("sem_wait");
 		pthread_exit(NULL);
 	}
@@ -102,12 +102,12 @@ PickUp(int id)
 
 	Test(id);
 
-	if (/* sem_post */)  {
+	if (sem_post(&Mutex) < 0)  {
 		perror("sem_post");
 		pthread_exit(NULL);
 	}
 
-	if (/* sem_wait */)  {
+	if (sem_wait(&Philosopher[id]) < 0)  {
 		perror("sem_wait");
 		pthread_exit(NULL);
 	}
@@ -116,7 +116,7 @@ PickUp(int id)
 void
 PutDown(int id)
 {
-	if (/* sem_wait */)  {
+	if (sem_wait(&Mutex) < 0)  {
 		perror("sem_wait");
 		pthread_exit(NULL);
 	}
@@ -126,7 +126,7 @@ PutDown(int id)
 	Test(LEFT(id));
 	Test(RIGHT(id));
 
-	if (/* sem_post */)  {
+	if (sem_post(&Mutex) < 0)  {
 		perror("sem_post");
 		pthread_exit(NULL);
 	}
@@ -162,13 +162,13 @@ main()
 	srand(0x8888);
 
 	for (i = 0 ; i < NUM_MEN ; i++)  {
-		if (/* sem_init */)  {
+		if (sem_init(&Philosopher[i], 0, 0) < 0)  {
 			perror("sem_init");
 			exit(1);
 		}
 		id[i] = i;
 	}
-	if (/* sem_init */)  {
+	if (sem_init(&Mutex, 0, 1) < 0)  {
 		perror("sem_init");
 		exit(1);
 	}
@@ -189,14 +189,8 @@ main()
 	}
 
 	for (i = 0 ; i < NUM_MEN ; i++)  {
-		if (/* sem_destroy */)  {
+		if (sem_destroy(&Philosopher[i]) < 0)  {
 			perror("sem_destroy");
 		}
 	}
-
-	if (/* sem_destroy */)  {
-		perror("sem_destroy");
-		exit(1);
-	}
-
 }

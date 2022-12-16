@@ -79,22 +79,22 @@ DiningPhilosopher(int *pId)
 
 		Thinking(id);
 
-		if (/* sem_wait */)  {
+		if (sem_wait(&ChopStick[id])<0)  {
 			perror("sem_wait");
 			pthread_exit(NULL);
 		}
-		if (/* sem_wait */)  {
+		if (sem_wait(&ChopStick[(id+1)%NUM_MEN])<0)  {
 			perror("sem_wait");
 			pthread_exit(NULL);
 		}
 
 		Eating(id);
 
-		if (/* sem_post */)  {
+		if (sem_post(&ChopStick[id])<0)  {
 			perror("sem_post");
 			pthread_exit(NULL);
 		}
-		if (/*sem_post */)  {
+		if (sem_post(&ChopStick[(id+1)%NUM_MEN])<0)  {
 			perror("sem_post");
 			pthread_exit(NULL);
 		}
@@ -113,7 +113,7 @@ main()
 	srand(0x8888);
 
 	for (i = 0 ; i < NUM_MEN ; i++)  {
-		if (/* sem_init */)  {
+		if (sem_init(&ChopStick[i],0,1)<0)  {
 			perror("sem_init");
 			exit(1);
 		}
@@ -136,7 +136,7 @@ main()
 	}
 
 	for (i = 0 ; i < NUM_MEN ; i++)  {
-		if (/* sem_destroy */)  {
+		if (sem_destroy(&ChopStick[i])<0)  {
 			perror("sem_destroy");
 		}
 	}

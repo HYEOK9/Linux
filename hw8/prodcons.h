@@ -1,4 +1,4 @@
-#define	MY_ID			0
+#define	MY_ID			52
 #define	SHM_KEY			(0x9000 + MY_ID)
 #define	SHM_MODE		(SHM_R | SHM_W | IPC_CREAT)
 

@@ -6,7 +6,7 @@ LDFLAGS = -lpthread
 .c.o :
 	$(CC) -c $(CFLAGS) $<
 
-ALL = producer consumer producer_s consumer_s prodcons dining dining2 prodcons_m prodcons_s
+ALL = prodcons_t producer consumer producer_s consumer_s prodcons dining dining2 prodcons_m prodcons_s sipc1_s sipc2_s sipc_t_s sipc_t_m
 
 all: $(ALL)
 
@@ -39,6 +39,18 @@ prodcons_m: prodcons_m.o
 
 prodcons_s: prodcons_s.o semlib2.o
 	$(CC) -o $@ $^ $(LDFLAGS)
+
+sipc1_s: sipc1_s.o
+	$(CC) -o $@ $< $(LDFLAGS)
+
+sipc2_s: sipc2_s.o
+	$(CC) -o $@ $< $(LDFLAGS)
+
+sipc_t_s: sipc_t_s.o
+	$(CC) -o $@ $< $(LDFLAGS)
+
+sipc_t_m: sipc_t_m.o
+	$(CC) -o $@ $< $(LDFLAGS)
 
 clean :
 	rm -rf *.o $(ALL)
