@@ -25,7 +25,7 @@ main()
 		//fd1을 쓸것이므로 fd[0]은 closeㅇ
 		close(fd[0]);
         	
-		//1과 fd[1]을 duplicateㅇ
+		//1과 fd[1]을 duplicate
         	if(dup(fd[1])==-1)  {
         		perror("dup");
 			exit(1);

@@ -6,7 +6,7 @@ LDFLAGS =
 .c.o :
 	$(CC) -c $(CFLAGS) $<
 
-ALL = pipe sync fifos fifoc msgq1 msgq2 shm sipc1 sipc2 mycp3 mipc
+ALL = pipe sync mymore fifos fifoc msgq1 msgq2 shm sipc1 sipc2 mycp3 mipc
 
 all: $(ALL)
 
