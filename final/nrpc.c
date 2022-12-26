@@ -44,7 +44,7 @@ int main(){
 			exit(1);
 		}
 
-		for(int i=0; i<*n; i++) result+=i;
+		for(int i=0; i<(int)*n; i++) result+=i;
 		*n=result;
 		printf("Calc = %d\n",*n);
 
